@@ -20,7 +20,7 @@ func (shaman *Shaman) newLightningBoltSpellConfig(isLightningOverload bool) core
 		isLightningOverload)
 
 	if shaman.HasMajorGlyph(proto.ShamanMajorGlyph_GlyphOfLightningBolt) {
-		spellConfig.DamageMultiplier += 0.04
+		spellConfig.DamageMultiplier += 0.1
 	}
 
 	if shaman.HasSetBonus(ItemSetSkyshatterRegalia, 4) {
