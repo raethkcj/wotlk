@@ -52,11 +52,11 @@ type Cast struct {
 	ChannelTime time.Duration
 }
 
-func (cast *Cast) EffectiveTime() time.Duration {
+func (cast *Cast) EffectiveTime(unit *Unit) time.Duration {
 	gcd := cast.GCD
 	if cast.GCD != 0 {
 		// TODO: isn't this wrong for spells like shadowfury, that have a reduced GCD?
-		gcd = max(GCDMin, gcd)
+		gcd = max(unit.GCDMin, gcd)
 	}
 	fullCastTime := cast.CastTime + cast.ChannelTime
 	return max(gcd, fullCastTime)
@@ -135,7 +135,7 @@ func (spell *Spell) makeCastFunc(config CastConfig) CastSuccessFunc {
 			return spell.castFailureHelper(sim, false, "casting/channeling %v for %s, curTime = %s", hc.ActionID, hc.Expires-sim.CurrentTime, sim.CurrentTime)
 		}
 
-		if effectiveTime := spell.CurCast.EffectiveTime(); effectiveTime != 0 {
+		if effectiveTime := spell.CurCast.EffectiveTime(spell.Unit); effectiveTime != 0 {
 			spell.SpellMetrics[target.UnitIndex].TotalCastTime += effectiveTime
 			spell.Unit.SetGCDTimer(sim, sim.CurrentTime+effectiveTime)
 		}
@@ -144,7 +144,7 @@ func (spell *Spell) makeCastFunc(config CastConfig) CastSuccessFunc {
 		if spell.CurCast.CastTime > 0 {
 			if sim.Log != nil && !spell.Flags.Matches(SpellFlagNoLogs) {
 				spell.Unit.Log(sim, "Casting %s (Cost = %0.03f, Cast Time = %s, Effective Time = %s)",
-					spell.ActionID, max(0, spell.CurCast.Cost), spell.CurCast.CastTime, spell.CurCast.EffectiveTime())
+					spell.ActionID, max(0, spell.CurCast.Cost), spell.CurCast.CastTime, spell.CurCast.EffectiveTime(spell.Unit))
 			}
 
 			spell.Unit.Hardcast = Hardcast{
@@ -182,7 +182,7 @@ func (spell *Spell) makeCastFunc(config CastConfig) CastSuccessFunc {
 
 		if sim.Log != nil && !spell.Flags.Matches(SpellFlagNoLogs) {
 			spell.Unit.Log(sim, "Casting %s (Cost = %0.03f, Cast Time = %s, Effective Time = %s)",
-				spell.ActionID, max(0, spell.CurCast.Cost), spell.CurCast.CastTime, spell.CurCast.EffectiveTime())
+				spell.ActionID, max(0, spell.CurCast.Cost), spell.CurCast.CastTime, spell.CurCast.EffectiveTime(spell.Unit))
 			spell.Unit.Log(sim, "Completed cast %s", spell.ActionID)
 		}
 

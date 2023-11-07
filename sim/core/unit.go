@@ -135,6 +135,7 @@ type Unit struct {
 	DynamicDamageTakenModifiers []DynamicDamageTakenModifier
 
 	GCD       *Timer
+	GCDMin    time.Duration
 	doNothing bool // flags that this character chose to do nothing.
 
 	// Used for applying the effect of a hardcast spell when casting finishes.
@@ -325,7 +326,7 @@ func (unit *Unit) InitialCastSpeed() float64 {
 }
 
 func (unit *Unit) SpellGCD() time.Duration {
-	return max(GCDMin, unit.ApplyCastSpeed(GCDDefault))
+	return max(unit.GCDMin, unit.ApplyCastSpeed(GCDDefault))
 }
 
 func (unit *Unit) updateCastSpeed() {
@@ -432,6 +433,7 @@ func (unit *Unit) finalize() {
 	unit.initialCastSpeed = unit.CastSpeed
 	unit.initialMeleeSwingSpeed = unit.SwingSpeed()
 	unit.initialRangedSwingSpeed = unit.RangedSwingSpeed()
+	unit.GCDMin = GCDMin
 
 	unit.StatDependencyManager.FinalizeStatDeps()
 	unit.initialStats = unit.ApplyStatDependencies(unit.initialStatsWithoutDeps)
