@@ -179,6 +179,7 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 
 	cdTimer := shaman.NewTimer()
 	cd := time.Minute * 3
+	damageBonus := 1.15
 
 	if shaman.HasMajorGlyph(proto.ShamanMajorGlyph_GlyphOfElementalMastery) {
 		cd -= time.Second * 30
@@ -192,9 +193,15 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 		Duration: time.Second * 15,
 		OnGain: func(aura *core.Aura, sim *core.Simulation) {
 			shaman.MultiplyCastSpeed(1.15)
+			shaman.PseudoStats.SchoolDamageDealtMultiplier[stats.SchoolIndexNature] *= damageBonus
+			shaman.PseudoStats.SchoolDamageDealtMultiplier[stats.SchoolIndexFire] *= damageBonus
+			shaman.PseudoStats.SchoolDamageDealtMultiplier[stats.SchoolIndexFrost] *= damageBonus
 		},
 		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			shaman.MultiplyCastSpeed(1 / 1.15)
+			shaman.PseudoStats.SchoolDamageDealtMultiplier[stats.SchoolIndexNature] /= damageBonus
+			shaman.PseudoStats.SchoolDamageDealtMultiplier[stats.SchoolIndexFire] /= damageBonus
+			shaman.PseudoStats.SchoolDamageDealtMultiplier[stats.SchoolIndexFrost] /= damageBonus
 		},
 	})
 
