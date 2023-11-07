@@ -179,6 +179,7 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 
 	cdTimer := shaman.NewTimer()
 	cd := time.Minute * 3
+	GCDModifier := time.Millisecond * 250
 
 	if shaman.HasMajorGlyph(proto.ShamanMajorGlyph_GlyphOfElementalMastery) {
 		cd -= time.Second * 30
@@ -192,9 +193,11 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 		Duration: time.Second * 15,
 		OnGain: func(aura *core.Aura, sim *core.Simulation) {
 			shaman.MultiplyCastSpeed(1.15)
+			shaman.GCDMin -= GCDModifier
 		},
 		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			shaman.MultiplyCastSpeed(1 / 1.15)
+			shaman.GCDMin += GCDModifier
 		},
 	})
 
